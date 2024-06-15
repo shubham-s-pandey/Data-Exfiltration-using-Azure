@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload File to Azure Blob Storage</title>
+</head>
+<body>
+    <h1>Upload File to Azure Blob Storage</h1>
+    <form id="uploadForm">
+        <input type="file" id="fileInput" name="file">
+        <input type="button" value="Upload" onclick="uploadFile()">
+    </form>
+    <div id="status"></div>
+    <script>
+        const SAS_TOKEN = "__";
+        const BLOB_URL = "https://__.blob.core.windows.net/test";
+        const CONTAINER_NAME = "test";
+
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                document.getElementById('status').innerText = 'No file selected';
+                return;
+            }
+
+            const url = `${BLOB_URL}/${file.name}?${SAS_TOKEN}`;
+            fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'x-ms-blob-type': 'BlockBlob',
+                    'Content-Type': file.type
+                },
+                body: file
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('status').innerText = 'File uploaded successfully';
+                } else {
+                    document.getElementById('status').innerText = 'Error uploading file: ' + response.statusText;
+                }
+            })
+            .catch(error => {
+                document.getElementById('status').innerText = 'Error uploading file: ' + error.message;
+            });
+        }
+    </script>
+</body>
+</html>
